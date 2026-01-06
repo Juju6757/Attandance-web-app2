@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Attendance System - Teacher Portal</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- EmailJS SDK -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+</head>
+<body>
+    <!-- Theme Transition Overlay -->
+    <div id="themeTransition" class="theme-transition"></div>
+    
+    <!-- Login Screen -->
+    <div id="loginScreen" class="login-screen">
+        <div class="login-container">
+            <!-- Theme Toggle Button -->
+            <div class="login-theme-toggle">
+                <button onclick="toggleTheme(event)" class="btn btn-theme-toggle-login" id="loginThemeToggle">
+                    <i class="fas fa-moon"></i>
+                </button>
+            </div>
+            
+            <div class="login-header">
+                <i class="fas fa-graduation-cap"></i>
+                <h1>Teacher Portal</h1>
+                <p>Student Attendance System</p>
+            </div>
+            
+            <!-- Auth Mode Toggle -->
+            <div class="auth-toggle">
+                <button type="button" class="toggle-btn active" id="loginToggle" onclick="showAuthForm('login')">
+                    <i class="fas fa-sign-in-alt"></i> Login
+                </button>
+                <button type="button" class="toggle-btn" id="registerToggle" onclick="showAuthForm('register')">
+                    <i class="fas fa-user-plus"></i> Register
+                </button>
+            </div>
+
+            <!-- Login Form -->
+            <form id="loginForm" class="auth-form active">
+                <!-- Recent Logins Dropdown -->
+                <div class="form-group" id="recentLoginsGroup" style="display: none;">
+                    <label for="recentLogins">
+                        <i class="fas fa-history"></i>
+                        Recent Usernames
+                    </label>
+                    <select id="recentLogins" onchange="fillLoginFromRecent()">
+                        <option value="">Select a recent username...</option>
+                    </select>
+                    <button type="button" class="btn btn-small btn-secondary" onclick="clearRecentLogins()" style="margin-top: 5px; font-size: 12px;">
+                        <i class="fas fa-trash"></i> Clear History
+                    </button>
+                </div>
+                
+                <div class="form-group">
+                    <label for="loginUsername">
+                        <i class="fas fa-user"></i>
+                        Username
+                    </label>
+                    <input type="text" id="loginUsername" name="username" required placeholder="Enter your username">
+                </div>
+                <div class="form-group">
+                    <label for="loginPassword">
+                        <i class="fas fa-lock"></i>
+                        Password
+                    </label>
+                    <input type="password" id="loginPassword" name="password" required placeholder="Enter your password">
+                </div>
+                <button type="submit" class="btn btn-primary auth-btn">
+                    <i class="fas fa-sign-in-alt"></i>
+                    Login
+                </button>
+                <div class="forgot-password-link">
+                    <a href="#" onclick="showForgotPasswordForm(); return false;">
+                        <i class="fas fa-key"></i> Forgot Password?
+                    </a>
+                </div>
+            </form>
+
+            <!-- Registration Form -->
+            <form id="registerForm" class="auth-form">
+                <!-- Profile Picture Upload -->
+                <div class="form-group profile-pic-group">
+                    <label>
+                        <i class="fas fa-user-circle"></i>
+                        Profile Picture (Optional)
+                    </label>
+                    <div class="profile-pic-container">
+                        <div class="profile-pic-preview" id="profilePicPreview">
+                            <i class="fas fa-user-circle"></i>
+                        </div>
+                        <div class="profile-pic-actions">
+                            <label for="profilePicture" class="btn btn-upload">
+                                <i class="fas fa-upload"></i> Choose Photo
+                            </label>
+                            <input type="file" id="profilePicture" accept="image/*" style="display: none;">
+                            <button type="button" class="btn btn-remove" id="removeProfilePic" style="display: none;">
+                                <i class="fas fa-times"></i> Remove
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="firstName">
+                            <i class="fas fa-user"></i>
+                            First Name
+                        </label>
+                        <input type="text" id="firstName" required placeholder="First name">
+                    </div>
+                    <div class="form-group">
+                        <label for="lastName">
+                            <i class="fas fa-user"></i>
+                            Last Name
+                        </label>
+                        <input type="text" id="lastName" required placeholder="Last name">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="email">
+                        <i class="fas fa-envelope"></i>
+                        Email Address
+                    </label>
+                    <input type="email" id="email" required placeholder="Enter email address">
+                </div>
+                <div class="form-group">
+                    <label for="department">
+                        <i class="fas fa-building"></i>
+                        Department
+                    </label>
+                    <select id="department" required>
+                        <option value="">Select Department</option>
+                        <option value="BCA">BCA Department</option>
+                        <option value="BBA">BBA Department</option>
+                        <option value="PMIR">PMIR Department</option>
+                        <option value="Administration">Administration</option>
+                        <option value="Management">Management</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="role">
+                        <i class="fas fa-id-badge"></i>
+                        Role
+                    </label>
+                    <select id="role" required>
+                        <option value="">Select Role</option>
+                        <option value="Teacher">Teacher</option>
+                        <option value="Professor">Professor</option>
+                        <option value="HOD">Head of Department</option>
+                        <option value="Admin">Administrator</option>
+                        <option value="Staff">Staff Member</option>
+                    </select>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="registerUsername">
+                            <i class="fas fa-user-circle"></i>
+                            Username
+                        </label>
+                        <input type="text" id="registerUsername" required placeholder="Choose username">
+                    </div>
+                    <div class="form-group">
+                        <label for="employeeId">
+                            <i class="fas fa-id-card"></i>
+                            Employee ID
+                        </label>
+                        <input type="text" id="employeeId" required placeholder="Employee ID">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="registerPassword">
+                            <i class="fas fa-lock"></i>
+                            Password
+                        </label>
+                        <input type="password" id="registerPassword" required placeholder="Create password" minlength="6">
+                    </div>
+                    <div class="form-group">
+                        <label for="confirmPassword">
+                            <i class="fas fa-lock"></i>
+                            Confirm Password
+                        </label>
+                        <input type="password" id="confirmPassword" required placeholder="Confirm password">
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-success auth-btn">
+                    <i class="fas fa-user-plus"></i>
+                    Register
+                </button>
+            </form>
+
+            <!-- Forgot Password Form - Step 1: Enter Email -->
+            <form id="forgotPasswordForm" class="auth-form">
+                <div class="form-group">
+                    <label for="forgotEmail">
+                        <i class="fas fa-envelope"></i>
+                        Email Address
+                    </label>
+                    <input type="email" id="forgotEmail" required placeholder="Enter your registered email">
+                </div>
+                <button type="submit" class="btn btn-primary auth-btn">
+                    <i class="fas fa-paper-plane"></i>
+                    Send OTP
+                </button>
+                <div class="back-to-login">
+                    <a href="#" onclick="showAuthForm('login'); return false;">
+                        <i class="fas fa-arrow-left"></i> Back to Login
+                    </a>
+                </div>
+            </form>
+
+            <!-- OTP Verification Form - Step 2: Enter OTP -->
+            <form id="otpVerificationForm" class="auth-form">
+                <div class="otp-info">
+                    <i class="fas fa-envelope-open-text"></i>
+                    <p>We've sent a 6-digit OTP to <strong id="otpEmailDisplay"></strong></p>
+                    <p class="otp-note">Please check your email and enter the code below.</p>
+                </div>
+                <div class="form-group">
+                    <label for="otpCode">
+                        <i class="fas fa-key"></i>
+                        Enter OTP Code
+                    </label>
+                    <input type="text" id="otpCode" required placeholder="Enter 6-digit code" maxlength="6" pattern="[0-9]{6}">
+                </div>
+                <div class="otp-timer" id="otpTimer">
+                    OTP expires in: <span id="otpCountdown">5:00</span>
+                </div>
+                <button type="submit" class="btn btn-primary auth-btn">
+                    <i class="fas fa-check"></i>
+                    Verify OTP
+                </button>
+                <div class="otp-actions">
+                    <button type="button" class="btn btn-link" id="resendOtpBtn" onclick="resendOTP()" disabled>
+                        <i class="fas fa-redo"></i> Resend OTP <span id="resendTimer">(60s)</span>
+                    </button>
+                </div>
+                <div class="back-to-login">
+                    <a href="#" onclick="cancelPasswordReset(); return false;">
+                        <i class="fas fa-times"></i> Cancel
+                    </a>
+                </div>
+            </form>
+
+            <!-- Reset Password Form - Step 3: Set New Password -->
+            <form id="resetPasswordForm" class="auth-form">
+                <div class="form-group">
+                    <label for="newPassword">
+                        <i class="fas fa-lock"></i>
+                        New Password
+                    </label>
+                    <input type="password" id="newPassword" required placeholder="Enter new password" minlength="6">
+                </div>
+                <div class="form-group">
+                    <label for="confirmNewPassword">
+                        <i class="fas fa-lock"></i>
+                        Confirm New Password
+                    </label>
+                    <input type="password" id="confirmNewPassword" required placeholder="Confirm new password">
+                </div>
+                <button type="submit" class="btn btn-success auth-btn">
+                    <i class="fas fa-check-circle"></i>
+                    Reset Password
+                </button>
+            </form>
+            
+            <!-- Demo Info (only shown for login) -->
+            <div id="demoInfo" class="login-info">
+                <p><strong>Demo Credentials:</strong></p>
+                <p>Username: <code>teacher</code></p>
+                <p>Password: <code>password123</code></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Application -->
+    <div id="mainApp" class="container" style="display: none;">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <h1><i class="fas fa-users"></i> Student Attendance System</h1>
+                <div class="header-right">
+                    <div class="user-info">
+                        <div class="user-profile-pic" id="userProfilePic">
+                            <i class="fas fa-user-circle"></i>
+                        </div>
+                        <span id="welcomeMessage">Welcome, Teacher</span>
+                    </div>
+                    <button onclick="toggleTheme(event)" class="btn btn-theme-toggle" id="themeToggle">
+                        <i class="fas fa-moon"></i>
+                    </button>
+                    <button onclick="logout()" class="btn btn-secondary logout-btn">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </button>
+                </div>
+            </div>
+            <div class="date-display">
+                <span id="currentDate"></span>
+            </div>
+        </header>
+
+        <!-- Navigation -->
+        <nav class="nav-tabs">
+            <button class="nav-btn active" onclick="showTab('students')">
+                <i class="fas fa-user-plus"></i> Manage Students
+            </button>
+            <button class="nav-btn" onclick="showTab('attendance')">
+                <i class="fas fa-clipboard-check"></i> Mark Attendance
+            </button>
+            <button class="nav-btn" onclick="showTab('reports')">
+                <i class="fas fa-chart-bar"></i> Reports
+            </button>
+        </nav>
+
+        <!-- Students Tab -->
+        <div id="students" class="tab-content active">
+            <div class="card">
+                <h2><i class="fas fa-user-plus"></i> Add New Student</h2>
+                <form id="studentForm" class="form">
+                    <div class="form-group">
+                        <label for="studentName">Student Name:</label>
+                        <input type="text" id="studentName" required placeholder="Enter student name">
+                    </div>
+                    <div class="form-group">
+                        <label>Student ID Configuration:</label>
+                        <div class="id-builder">
+                            <div class="id-field">
+                                <label for="studentStream">Stream:</label>
+                                <select id="studentStream" required>
+                                    <option value="">Select Stream</option>
+                                    <option value="BCA">BCA</option>
+                                    <option value="BBA">BBA</option>
+                                    <option value="PMIR">PMIR</option>
+                                </select>
+                            </div>
+                            <div class="id-field">
+                                <label for="studentYear">Year:</label>
+                                <select id="studentYear" required>
+                                    <option value="">Select Year</option>
+                                </select>
+                            </div>
+                            <div class="id-field">
+                                <label for="rollNumber">Roll Number:</label>
+                                <input type="number" id="rollNumber" required placeholder="000" min="1" max="999">
+                            </div>
+                        </div>
+                        <div class="generated-id">
+                            <label>Generated Student ID:</label>
+                            <div id="previewId" class="id-preview">Select options to preview ID</div>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> Add Student
+                    </button>
+                </form>
+            </div>
+
+            <div class="card">
+                <h2><i class="fas fa-users"></i> Student List</h2>
+                
+                <!-- Stream Filter Buttons -->
+                <div class="stream-filters">
+                    <button class="stream-filter-btn active" onclick="filterByStream('all')" data-stream="all">
+                        <i class="fas fa-list"></i> All Streams
+                    </button>
+                    <button class="stream-filter-btn" onclick="filterByStream('BCA')" data-stream="BCA">
+                        <i class="fas fa-laptop-code"></i> BCA
+                    </button>
+                    <button class="stream-filter-btn" onclick="filterByStream('BBA')" data-stream="BBA">
+                        <i class="fas fa-briefcase"></i> BBA
+                    </button>
+                    <button class="stream-filter-btn" onclick="filterByStream('PMIR')" data-stream="PMIR">
+                        <i class="fas fa-chart-line"></i> PMIR
+                    </button>
+                </div>
+                
+                <div class="search-box">
+                    <input type="text" id="searchStudent" placeholder="Search students..." onkeyup="searchStudents()">
+                    <i class="fas fa-search"></i>
+                </div>
+                
+                <div id="studentsList" class="students-list">
+                    <!-- Students will be populated here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Attendance Tab -->
+        <div id="attendance" class="tab-content">
+            <div class="card">
+                <h2><i class="fas fa-clipboard-check"></i> Mark Attendance</h2>
+                <div class="attendance-date">
+                    <label for="attendanceDate">Date:</label>
+                    <input type="date" id="attendanceDate">
+                    <button onclick="loadAttendanceForDate()" class="btn btn-secondary">Load</button>
+                </div>
+                <div id="attendanceList" class="attendance-list">
+                    <!-- Attendance list will be populated here -->
+                </div>
+                <div class="attendance-actions">
+                    <button onclick="saveAttendance()" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Save Attendance
+                    </button>
+                    <button onclick="markAllPresent()" class="btn btn-success">
+                        <i class="fas fa-check-double"></i> Mark All Present
+                    </button>
+                    <button onclick="markAllAbsent()" class="btn btn-danger">
+                        <i class="fas fa-times-circle"></i> Mark All Absent
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Reports Tab -->
+        <div id="reports" class="tab-content">
+            <div class="card">
+                <h2><i class="fas fa-chart-bar"></i> Attendance Reports</h2>
+                <div class="report-controls">
+                    <div class="form-group">
+                        <label for="reportStudent">Select Student:</label>
+                        <select id="reportStudent">
+                            <option value="">All Students</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="reportStartDate">From Date:</label>
+                        <input type="date" id="reportStartDate">
+                    </div>
+                    <div class="form-group">
+                        <label for="reportEndDate">To Date:</label>
+                        <input type="date" id="reportEndDate">
+                    </div>
+                    <button onclick="generateReport()" class="btn btn-primary">
+                        <i class="fas fa-chart-line"></i> Generate Report
+                    </button>
+                    <button onclick="exportReport()" class="btn btn-success">
+                        <i class="fas fa-download"></i> Export CSV
+                    </button>
+                </div>
+                <div id="reportOutput" class="report-output">
+                    <!-- Report will be displayed here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>&copy; 2024 Student Attendance System. Built with HTML, CSS & JavaScript.</p>
+        </footer>
+    </div>
+
+    <!-- Modal for editing student -->
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeEditModal()">&times;</span>
+            <h2>Edit Student</h2>
+            <form id="editStudentForm" class="form">
+                <input type="hidden" id="editStudentOriginalId">
+                <div class="form-group">
+                    <label for="editStudentName">Student Name:</label>
+                    <input type="text" id="editStudentName" required>
+                </div>
+                <div class="form-group">
+                    <label>Student ID Configuration:</label>
+                    <div class="id-builder">
+                        <div class="id-field">
+                            <label for="editStudentStream">Stream:</label>
+                            <select id="editStudentStream" required>
+                                <option value="">Select Stream</option>
+                                <option value="BCA">BCA</option>
+                                <option value="BBA">BBA</option>
+                                <option value="PMIR">PMIR</option>
+                            </select>
+                        </div>
+                        <div class="id-field">
+                            <label for="editStudentYear">Year:</label>
+                            <select id="editStudentYear" required>
+                                <option value="">Select Year</option>
+                            </select>
+                        </div>
+                        <div class="id-field">
+                            <label for="editRollNumber">Roll Number:</label>
+                            <input type="number" id="editRollNumber" required placeholder="000" min="1" max="999">
+                        </div>
+                    </div>
+                    <div class="generated-id">
+                        <label>Generated Student ID:</label>
+                        <div id="editPreviewId" class="id-preview">Select options to preview ID</div>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save"></i> Save Changes
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
